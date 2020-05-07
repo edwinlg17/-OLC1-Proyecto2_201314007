@@ -1,11 +1,20 @@
 np = 0;
 
 function btnAna() {
-    alert("alerta");
+    var url = 'http://localhost:8000/api/nueva';
 
-    $(document).ready(function () {
-        alert("jQuery esta funcionando !!");
-    });
+    fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            alert("dato recivido: " + data.var);
+            console.log("dato recivido: " + data.var);
+        })
+        .catch(function (error) {
+            alert('Hubo un problema con la petición Fetch:' + error.message);
+        });
+
 }
 
 function btnAbr() {
@@ -83,7 +92,24 @@ function btnGuaCom() {
 }
 
 function btnRepLex() {
+    con = document.getElementsByClassName("tab-pane active");
+    ele = con[0];
+    ide = ele.id;
+    tex = document.getElementById("t" + ide).value;
 
+    var url = 'http://localhost:8000/api/nueva';
+
+    var data = ({ var: tex });
+
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(res => res.json())
+        .catch(error => console.error('Error:', error))
+        .then(response => console.log('valor recivido:', response.var));
 }
 
 function btnRepSin() {
