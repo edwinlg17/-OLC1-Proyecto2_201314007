@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 
+global.lis = [];
+
 // configuraciones
 app.set('port', 8000);
 app.set('json spaces', 2);
@@ -21,6 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 // rutas
 app.use('/api/index', require('./routes/index.js'));
 app.use('/api/nueva', require('./routes/nueva.js'));
+app.use('/api/nombre', require('./routes/nombre.js'));
 
 // inicio del servidor
 app.listen(app.get('port'), () => {

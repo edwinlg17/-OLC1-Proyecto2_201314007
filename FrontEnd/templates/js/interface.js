@@ -1,15 +1,17 @@
 np = 0;
 
 function btnAna() {
-    var url = 'http://localhost:8000/api/nueva';
+    var url = 'http://localhost:8000/api/nombre';
 
     fetch(url)
         .then(function (response) {
             return response.json();
         })
         .then(function (data) {
-            alert("dato recivido: " + data.var);
-            console.log("dato recivido: " + data.var);
+            var lis = data.var;
+            for (var i = 0; i < lis.length; i++) {
+                console.log(lis[i]);
+            }
         })
         .catch(function (error) {
             alert('Hubo un problema con la petición Fetch:' + error.message);
@@ -97,7 +99,7 @@ function btnRepLex() {
     ide = ele.id;
     tex = document.getElementById("t" + ide).value;
 
-    var url = 'http://localhost:8000/api/nueva';
+    var url = 'http://localhost:8000/api/nombre';
 
     var data = ({ var: tex });
 
@@ -107,9 +109,10 @@ function btnRepLex() {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(res => res.json())
+    })
+        .then(res => res.json())
         .catch(error => console.error('Error:', error))
-        .then(response => console.log('valor recivido:', response.var));
+        .then(response => console.log('respuesta servidor: ', response.var));
 }
 
 function btnRepSin() {
