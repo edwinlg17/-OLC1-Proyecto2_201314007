@@ -1,22 +1,25 @@
 np = 0;
 
 function btnAna() {
-    var url = 'http://localhost:8000/api/nombre';
+    con = document.getElementsByClassName("tab-pane active");
+    ele = con[0];
+    ide = ele.id;
+    tex = document.getElementById("t" + ide).value;
 
-    fetch(url)
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            var lis = data.var;
-            for (var i = 0; i < lis.length; i++) {
-                console.log(lis[i]);
-            }
-        })
-        .catch(function (error) {
-            alert('Hubo un problema con la petición Fetch:' + error.message);
-        });
+    var url = 'http://localhost:8000/api/analizar';
 
+    var data = ({ val: tex });
+
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res => res.json())
+        .catch(error => console.error('Error:', error))
+        .then(response => console.log('respuesta servidor: ', response.val));
 }
 
 function btnAbr() {
@@ -94,25 +97,7 @@ function btnGuaCom() {
 }
 
 function btnRepLex() {
-    con = document.getElementsByClassName("tab-pane active");
-    ele = con[0];
-    ide = ele.id;
-    tex = document.getElementById("t" + ide).value;
 
-    var url = 'http://localhost:8000/api/nombre';
-
-    var data = ({ var: tex });
-
-    fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(res => res.json())
-        .catch(error => console.error('Error:', error))
-        .then(response => console.log('respuesta servidor: ', response.var));
 }
 
 function btnRepSin() {
@@ -122,6 +107,23 @@ function btnRepSin() {
 function btnNuePes() {
     np++;
     crePes("nuevo " + np + " ", "", np);
+}
+
+function obtAST() {
+    var tex = document.getElementById('tSal');
+
+    var url = 'http://localhost:8000/api/analizar';
+
+    fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            tex.innerHTML = data.val;
+        })
+        .catch(function (error) {
+            alert('Hubo un problema con la petición Fetch:' + error.message);
+        });
 }
 
 function crePes(nom, cont, nps) {
@@ -163,4 +165,5 @@ function crePes(nom, cont, nps) {
     con.appendChild(ndiv);
 
 }
+
 

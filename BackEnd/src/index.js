@@ -21,9 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // rutas
-app.use('/api/index', require('./routes/index.js'));
-app.use('/api/nueva', require('./routes/nueva.js'));
-app.use('/api/nombre', require('./routes/nombre.js'));
+app.use('/api/analizar', require('./routes/analizar'));
 
 // inicio del servidor
 app.listen(app.get('port'), () => {
