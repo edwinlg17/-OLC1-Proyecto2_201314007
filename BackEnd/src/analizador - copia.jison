@@ -53,9 +53,7 @@
 "while"                 { return 'tkRWhi'; }
 "do"                    { return 'tkRDo'; }
 
-"++"                    { return 'tkSInc'; }
 "+"                     { return 'tkSMas'; }
-"--"                    { return 'tkSDec'; }
 "-"                     { return 'tkSGui'; } 
 "*"                     { return 'tkSPor'; } 
 "/"                     { return 'tkSBarInc'; } 
@@ -66,15 +64,11 @@
 "\""                    { return 'tkSComDob'; }
 
 "\\"                    { return 'tkSBarInv'; }
-"&&"                    { return 'tkSAnd'; }
-"||"                    { return 'tkSOr'; }
-"!="                    { return 'tkSDif'; }
+"&"                     { return 'tkSAmp'; }
+"|"                     { return 'tkSBarVer'; }
 "!"                     { return 'tkSAdm'; }
-"=="                    { return 'tkSDIgu'; }
 "="                     { return 'tkSIgu'; }
-">="                    { return 'tkSMayIgu'; }
 ">"                     { return 'tkSMay'; }
-"<="                    { return 'tkSMenIgu'; }
 "<"                     { return 'tkSMen'; }
 
 ","                     { return 'tkSCom'; }
@@ -102,15 +96,11 @@
 /lex
 
 /* asociatividad y precedencia */
-// logicas
-%left 'tkSAnd' 'tkSOr'
-// relacionales
-%left 'tkSDIgu' 'tkSMay' 'tkSMayIgu' 'tkSMen' 'tkSMenIgu' 'tkSDif' 
-// operaciones aritmeticas
 %left 'tkSMas' 'tkSGui'
-%left 'tkSPor' 'tkSBarInc'  
-%left 'tkSPot' 'tkSMod'
-%left NEG
+%left 'tkSPor' 'tkSBarInc' 'tkSMod' 
+%left 'tkSEle'
+%left UMINUS
+%left 'tkSPot'
 
 %start S
 
@@ -134,7 +124,7 @@ CLAIMPP
 SINCLAIMP 
     : tkRCla tkIde tkSLlaAbr MMFV tkSLlaCie                             { $$ = $1 + $2 + $3 + $4 + $5; }
     | tkRImp ESPIMP tkSPunCom                                           { $$ = $1 + $2 + $3; }
-    | error REQ                                                         { console.log('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error REQ                                                         { console.log(yytext); }
     ;
 
 ESPIMP
@@ -158,7 +148,7 @@ SINMMFV
     | tkRVoi tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; }                                           
     | TIP tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; }                                     
     | TIP DECVARMUL tkSPunCom                                           { $$ = $1 + $2 + $3; }     
-    | error REQ                                                         { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error REQ                                                         { console.log(yytext); }
     ;
 
 INS 
@@ -184,7 +174,7 @@ SININS
     | tkRCon tkSPunCom                                                                              { $$ = $1 + $2; }
     | tkRRet tkSPunCom                                                                              { $$ = $1 + $2; }
     | tkRRet EXP tkSPunCom                                                                          { $$ = $1 + $2 + $3; }
-    | error REQ                                                                                     { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error REQ                                                                                     { console.log(yytext); }
     ;
 
 DECASI
@@ -194,7 +184,7 @@ DECASI
 
 ASIINC
     : tkIde tkSIgu EXP                                                  { $$ = $1 + $2 + $3; }
-    | EXP                                                               
+    | tkIde INC                                                         { $$ = $1 + $2; }
     ;
 
 INC 
@@ -242,35 +232,47 @@ DECVARMUL
     | DECVARMUL tkSCom tkIde tkSIgu EXP                                 { $$ = $1 + $2 + $3 + $4 + $5; }
     ;
 
-
 EXP 
-    : EXP tkSAnd EXP                                                    { $$ = $1 + $2 + $3; } 
-	| EXP tkSOr EXP                                                     { $$ = $1 + $2 + $3; } 
+    : VAL EXPP                                                          { $$ = $1 + $2; console.log($1 + $2); }
+    ;
 
-    | EXP tkSDIgu EXP                                                   { $$ = $1 + $2 + $3; } 
-    | EXP tkSMay EXP                                                    { $$ = $1 + $2 + $3; } 
-    | EXP tkSMayIgu EXP                                                 { $$ = $1 + $2 + $3; } 
-    | EXP tkSMen EXP                                                    { $$ = $1 + $2 + $3; } 
-    | EXP tkSMenIgu EXP                                                 { $$ = $1 + $2 + $3; } 
-    | EXP tkSDif EXP                                                    { $$ = $1 + $2 + $3; } 
-    
-    | EXP tkSMas EXP                                                    { $$ = $1 + $2 + $3; }
-	| EXP tkSGui EXP                                                    { $$ = $1 + $2 + $3; }
-	| EXP tkSPor EXP                                                    { $$ = $1 + $2 + $3; }
-	| EXP tkSPot EXP                                                    { $$ = $1 + $2 + $3; }
-	| EXP tkSMod EXP                                                    { $$ = $1 + $2 + $3; }
-	| tkSGui EXP %prec NEG	                                            { $$ = $1 + $2; }
-    | tkSAdm EXP %prec NEG	                                            { $$ = $1 + $2; }
-    | VAL
-    | VAL tkSInc %prec NEG	                                            { $$ = $1 + $2; }
-    | VAL tkSDec %prec NEG	                                            { $$ = $1 + $2; }
+EXPP
+    : OPE EXP                                                           { $$ = $1 + $2;  }
+    | OPE 
+    |                                                                   { $$ = ''; }
+    ;
+
+OPE 
+    : tkSMas 
+    | tkSGui
+    | tkSGui tkSGui                                                     { $$ = $1 + $2; }
+    | tkSMas tkSMas                                                     { $$ = $1 + $2; }
+    | tkSPor 
+    | tkSBarInc 
+    | tkSPot 
+    | tkSMod 
+    | tkSIgu tkSIgu                                                     { $$ = $1 + $2; }
+    | tkSAdm tkSIgu                                                     { $$ = $1 + $2; }
+    | tkSMay tkSIgu                                                     { $$ = $1 + $2; }
+    | tkSMen tkSIgu                                                     { $$ = $1 + $2; }
+    | tkSMay 
+    | tkSMen 
+    | tkSAmp tkSAmp                                                     { $$ = $1 + $2; }
+    | tkSBarVer tkSBarVer                                               { $$ = $1 + $2; }
     ;
 
 VAL 
+    : tkCad
+    | tkCar                                                                 
+    | VAL2                                                                  
+    | tkSGui VAL2                                                        { $$ = $1 + $2; }
+    | tkSAdm VAL2                                                        { $$ = $1 + $2; }
+    ;
+
+VAL2 
     : tkNum
     | tkDec
-    | tkCad
-    | tkCar                                                                 
+    
     | tkRTru
     | tkRFal
     | tkIde

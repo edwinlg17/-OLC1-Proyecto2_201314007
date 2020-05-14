@@ -4,7 +4,7 @@ import java.util.LinkedList;
 class hola{
 
     void main(){
-        int a=15, b, c=1+1;
+        int a=15, b, c=1+1+fun() + fun2(1,2);
         b = fun();
 
         if(true){
@@ -42,7 +42,10 @@ class hola{
         System.out.print("cad 1" + "cad 2");
     }
 
-    void met(){}
+    void met(){
+        boolean a = -a-- - -b-- == "hola" && !true ;
+        int b, c, d;
+    }
 
     void metPar(int a, double b, char c, String d, boolean e){}
 
