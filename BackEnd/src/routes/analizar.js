@@ -1,10 +1,10 @@
 const { Router } = require('express');
 const router = Router();
+const ana = require('./analizador');
 
 var cod1 = '', cod2 = '', ast;
 
 router.get('/', (req, res) => {
-    const ana = require('./analizador');
     ast = ana.parse(cod1);
     console.log('->' + ast + '<-');
     res.json({ val: ast });

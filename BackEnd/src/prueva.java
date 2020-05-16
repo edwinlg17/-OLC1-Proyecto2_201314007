@@ -3,7 +3,33 @@ import java.util.LinkedList;
 
 class hola{
 
+    
     void main(){
+        do{
+            break;
+            continue;
+            return;
+            return 5+5;
+        }while(true);
+
+
+        //int a = 15 + 1.5 - 'a' * "hola" / true ^ false % var1 + fun() + fun2(1, 2) == 1 && !true != -1-- - -2-- || 1<2 || 1>2 || 1<=2 || 1>=2;
+
+        //int a = 1 + 3 * 2 ^ 3 - 4 == 5;
+
+        /*int a = 15, b, c = 1 + 1 + fun() + fun2(1,2);
+
+        String cad1 = "hola1", cad2, cad3 = "1";
+
+        cad1 = "otro texto: " + va3;
+
+        System.out.println("cad3" + "cad4");
+
+        while(true == true){
+           System.out.println("cad3" + "cad4");
+        }*/
+
+        /*String c = "hola";
         int a=15, b, c=1+1+fun() + fun2(1,2);
         b = fun();
 
@@ -31,9 +57,7 @@ class hola{
             System.out.println("cad 1" + "cad 2");
         }
 
-        while(true == true){
-            System.out.print("cad 1" + "cad 2");
-        }
+        
 
         do{
             System.out.print("cad 1" + "cad 2");
@@ -57,6 +81,7 @@ class hola{
 
 class hola2{
 
-
+*/
+    }
 }
 

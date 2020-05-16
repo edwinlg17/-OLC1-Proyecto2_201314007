@@ -1,3 +1,11 @@
+/* Importaciones  */
+%{
+	const tipo	= require('./apiJson').tipo;
+    const operacion	= require('./apiJson').operacion;
+    const insAPI = require('./apiJson').insAPI;
+
+%}
+
 /* Analizador Lexico */
 
 %lex
@@ -89,7 +97,7 @@
 
 ([a-zA-Z_])[a-zA-Z0-9_]*	                { return 'tkIde'; }    // identificadores
 
-[0-9]+("."[0-9]+)?\b  	                    { return 'tkDec'; }     // decimal
+[0-9]+("."[0-9]+)\b  	                    { return 'tkDec'; }     // decimal
 [0-9]+\b				                    { return 'tkNum'; }     // numero
 
 \s+											// se ignoran espacios en blanco
@@ -134,7 +142,7 @@ CLAIMPP
 SINCLAIMP 
     : tkRCla tkIde tkSLlaAbr MMFV tkSLlaCie                             { $$ = $1 + $2 + $3 + $4 + $5; }
     | tkRImp ESPIMP tkSPunCom                                           { $$ = $1 + $2 + $3; }
-    | error REQ                                                         { console.log('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+//    | error REQ                                                         { console.log('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
     ;
 
 ESPIMP
@@ -157,131 +165,168 @@ SINMMFV
     : tkRVoi tkRMai tkSParAbr tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; }
     | tkRVoi tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; }                                           
     | TIP tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; }                                     
-    | TIP DECVARMUL tkSPunCom                                           { $$ = $1 + $2 + $3; }     
-    | error REQ                                                         { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | TIP DECVARMUL tkSPunCom                                           { $$ = insAPI.dec($1, $2); }     
+//    | error REQ                                                         { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
     ;
 
 INS 
-    : INSP
-    |                                                                   { $$ = ''; }
+    : INSP                                                              { console.log(JSON.stringify($1, null, 2)); }
+    |                                                                   { $$ = 'indefinido'; }
     ;
 
 INSP
-    : INSP SININS                                                       { $$ = $1 + $2; }
-    | SININS
+    : INSP SININS                                                       { $1.push($2); $$ = $1; }
+    | SININS                                                            { 
+        if(Array.isArray($1)) { 
+            $$ = $1; 
+        } else { 
+            $$ = [$1]; 
+        } 
+    } 
     ;
 
 SININS 
-    : TIP DECVARMUL tkSPunCom                                                                       { $$ = $1 + $2 + $3; }  
-    | tkIde tkSIgu EXP tkSPunCom                                                                    { $$ = $1 + $2 + $3 + $4; }
-    | tkRSis tkSPun tkROut tkSPun PRI tkSParAbr EXP tkSParCie tkSPunCom                             { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7 + $8 + $9; }   
-    | tkRIf tkSParAbr EXP tkSParCie tkSLlaAbr INS tkSLlaCie ELS                                     { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7 + $8; }   
-    | tkRSwi tkSParAbr EXP tkSParCie tkSLlaAbr CAS tkSLlaCie                                        { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; } 
-    | tkRFor tkSParAbr DECASI tkSPunCom EXP tkSPunCom ASIINC tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7 + $8 + $9 + $10 + $11; }
-    | tkRWhi tkSParAbr EXP tkSParCie tkSLlaAbr INS tkSLlaCie                                        { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; }   
-    | tkRDo tkSLlaAbr INS tkSLlaCie tkRWhi tkSParAbr EXP tkSParCie tkSPunCom                        { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7 + $8 + $9; }           
-    | tkRBre tkSPunCom                                                                              { $$ = $1 + $2; }
-    | tkRCon tkSPunCom                                                                              { $$ = $1 + $2; }
-    | tkRRet tkSPunCom                                                                              { $$ = $1 + $2; }
-    | tkRRet EXP tkSPunCom                                                                          { $$ = $1 + $2 + $3; }
-    | error REQ                                                                                     { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    : TIP DECVARMUL tkSPunCom                                                                       { $$ = insAPI.dec($1, $2); }  
+    | tkIde tkSIgu EXP tkSPunCom                                                                    { $$ = insAPI.asi($1, $3); }
+    | tkRSis tkSPun tkROut tkSPun PRI tkSParAbr EXP tkSParCie tkSPunCom                             { $$ = insAPI.pri($5, $7); }   
+    | tkRIf tkSParAbr EXP tkSParCie tkSLlaAbr INS tkSLlaCie ELS                                     { 
+        var a = []; 
+        if(Array.isArray($8)){ 
+            $8.unshift(insAPI.if($3, $6)); 
+            $$ = $8; 
+        } else { 
+            if($8 != '')
+                a.push($8);
+            a.unshift(insAPI.if($3, $6)); 
+            $$ = a; 
+        } 
+    }
+    | tkRSwi tkSParAbr EXP tkSParCie tkSLlaAbr CAS tkSLlaCie                                        { $$ = insAPI.swi($3, $6); }
+    | tkRFor tkSParAbr DECASI tkSPunCom EXP tkSPunCom ASIINC tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = insAPI.for($3, $5, $7, $10); }
+    | tkRWhi tkSParAbr EXP tkSParCie tkSLlaAbr INS tkSLlaCie                                        { $$ = insAPI.whi($3, $6);  }   
+    | tkRDo tkSLlaAbr INS tkSLlaCie tkRWhi tkSParAbr EXP tkSParCie tkSPunCom                        { $$ = insAPI.do($7, $3); }           
+    | tkRBre tkSPunCom                                                                              { $$ = insAPI.bre(); }
+    | tkRCon tkSPunCom                                                                              { $$ = insAPI.con(); }
+    | tkRRet tkSPunCom                                                                              { $$ = insAPI.ret('indefinido'); }
+    | tkRRet EXP tkSPunCom                                                                          { $$ = insAPI.ret($2); }
+//    | error REQ                                                                                     { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
     ;
 
+// asignacion
 DECASI
-    : TIP tkIde tkSIgu EXP                                              { $$ = $1 + $2 + $3 + $4; } 
-    | tkIde tkSIgu EXP                                                  { $$ = $1 + $2 + $3; }
+    : TIP tkIde tkSIgu EXP                                              { $$ = insAPI.dec($1, [insAPI.nueVar($2, $4)]); } 
+    | tkIde tkSIgu EXP                                                  { $$ = insAPI.asi($1, $3); }
     ;
 
 ASIINC
-    : tkIde tkSIgu EXP                                                  { $$ = $1 + $2 + $3; }
+    : tkIde tkSIgu EXP                                                  { $$ = insAPI.asi($1, $3); }
     | EXP                                                               
     ;
 
-INC 
-    : tkSGui tkSGui                                                     { $$ = $1 + $2; }
-    | tkSMas tkSMas                                                     { $$ = $1 + $2; }
-    ;
-
 // else if y else
-ELS		
-    : tkREls ELSP                                                       { $$ = $1 + $2; }
-    |	                                                                { $$ = ''; }
-    ;	                                                           
-
-// case	default	
-ELSP		
-    : tkRIf tkSParAbr EXP tkSParCie tkSLlaAbr INS tkSLlaCie ELS         { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7 + $8; } 
-	| tkSLlaAbr INS tkSLlaCie                                           { $$ = $1 + $2 + $3; }
-    ;
-
-CAS
-    : CASP
+ELS
+    : tkREls SINELS                                                     { $$ = $2; }
     |                                                                   { $$ = ''; }
     ;
 
-CASP		
-    : SWICAS tkSDosPun INS                                              { $$ = $1 + $2 + $3; }                        
-    | CASP SWICAS tkSDosPun INS                                         { $$ = $1 + $2 + $3 + $4; } 
+SINELS 
+    : tkRIf tkSParAbr EXP tkSParCie tkSLlaAbr INS tkSLlaCie ELS         { 
+        var a = []; 
+        if(Array.isArray($8)){ 
+            $8.unshift(insAPI.elsif($3, $6)); 
+            $$ = $8; 
+        } else { 
+            if($8 != '')
+                a.push($8);
+            a.unshift(insAPI.elsif($3, $6)); 
+            $$ = a; 
+        } 
+    }
+    | tkSLlaAbr INS tkSLlaCie                                           { $$ = insAPI.els($2); } 
     ;
 
-SWICAS
-    : tkRCas EXP                                                        { $$ = $1 + $2; } 
-    | tkRDef
+
+// case
+CAS 
+    : CASP 
+    |                                                                   { $$ = 'indefinido'; }
     ;
+
+CASP		
+    : tkRCas EXP tkSDosPun INS CAS                                      { 
+        var a = []; 
+        if(Array.isArray($5)){ 
+            $5.unshift(insAPI.cas($2, $4)); 
+            $$ = $5; 
+        } else { 
+            if($5 != 'indefinido')
+                a.push($5);
+            a.unshift(insAPI.cas($2, $4)); 
+            $$ = a; 
+        } 
+    }                      
+    | tkRDef tkSDosPun INS                                              { $$ = insAPI.def($3); }                       
+    ;
+
 
 // print
 PRI 
-    : tkRPri
-    | tkRPriLn
+    : tkRPri                                                            
+    | tkRPriLn                                                          
     ;
 
 DECVARMUL
-    : tkIde 
-    | tkIde tkSIgu EXP                                                  { $$ = $1 + $2 + $3; }
-    | DECVARMUL tkSCom tkIde                                            { $$ = $1 + $2 + $3; }
-    | DECVARMUL tkSCom tkIde tkSIgu EXP                                 { $$ = $1 + $2 + $3 + $4 + $5; }
+    : SINVAR                                                            { $$ = [$1]; }
+    | DECVARMUL tkSCom SINVAR                                           { $1.push($3); $$ = $1; }
     ;
 
+SINVAR
+    : tkIde                                                             { $$ = insAPI.nueVar($1, 'indefinido'); }
+    | tkIde tkSIgu EXP                                                  { $$ = insAPI.nueVar($1, $3); }
+    ;
 
 EXP 
-    : EXP tkSAnd EXP                                                    { $$ = $1 + $2 + $3; } 
-	| EXP tkSOr EXP                                                     { $$ = $1 + $2 + $3; } 
+    : EXP tkSAnd EXP                                                    { $$ = insAPI.ope($1, operacion.and, $3);}
+	| EXP tkSOr EXP                                                     { $$ = insAPI.ope($1, operacion.or, $3); }
 
-    | EXP tkSDIgu EXP                                                   { $$ = $1 + $2 + $3; } 
-    | EXP tkSMay EXP                                                    { $$ = $1 + $2 + $3; } 
-    | EXP tkSMayIgu EXP                                                 { $$ = $1 + $2 + $3; } 
-    | EXP tkSMen EXP                                                    { $$ = $1 + $2 + $3; } 
-    | EXP tkSMenIgu EXP                                                 { $$ = $1 + $2 + $3; } 
-    | EXP tkSDif EXP                                                    { $$ = $1 + $2 + $3; } 
+    | EXP tkSDIgu EXP                                                   { $$ = insAPI.ope($1, operacion.igu, $3); } 
+    | EXP tkSMay EXP                                                    { $$ = insAPI.ope($1, operacion.may, $3); } 
+    | EXP tkSMayIgu EXP                                                 { $$ = insAPI.ope($1, operacion.men, $3); }
+    | EXP tkSMen EXP                                                    { $$ = insAPI.ope($1, operacion.mayigu, $3); }
+    | EXP tkSMenIgu EXP                                                 { $$ = insAPI.ope($1, operacion.menigu, $3); } 
+    | EXP tkSDif EXP                                                    { $$ = insAPI.ope($1, operacion.dif, $3); } 
     
-    | EXP tkSMas EXP                                                    { $$ = $1 + $2 + $3; }
-	| EXP tkSGui EXP                                                    { $$ = $1 + $2 + $3; }
-	| EXP tkSPor EXP                                                    { $$ = $1 + $2 + $3; }
-	| EXP tkSPot EXP                                                    { $$ = $1 + $2 + $3; }
-	| EXP tkSMod EXP                                                    { $$ = $1 + $2 + $3; }
-	| tkSGui EXP %prec NEG	                                            { $$ = $1 + $2; }
-    | tkSAdm EXP %prec NEG	                                            { $$ = $1 + $2; }
+    | EXP tkSMas EXP                                                    { $$ = insAPI.ope($1, operacion.sum, $3); } 
+	| EXP tkSGui EXP                                                    { $$ = insAPI.ope($1, operacion.res, $3); }
+	| EXP tkSPor EXP                                                    { $$ = insAPI.ope($1, operacion.mul, $3); }
+    | EXP tkSBarInc EXP                                                 { $$ = insAPI.ope($1, operacion.div, $3); }
+	| EXP tkSPot EXP                                                    { $$ = insAPI.ope($1, operacion.pot, $3); }
+	| EXP tkSMod EXP                                                    { $$ = insAPI.ope($1, operacion.mod, $3); }
+
+	| tkSGui EXP %prec NEG	                                            { $$ = insAPI.ope('indefinido', $2, operacion.neg); } 
+    | tkSAdm EXP %prec NEG	                                            { $$ = insAPI.ope('indefinido', $2, operacion.not); } 
+    | VAL tkSInc %prec NEG	                                            { $$ = insAPI.ope($1, operacion.inc, 'indefinido'); } 
+    | VAL tkSDec %prec NEG	                                            { $$ = insAPI.ope($1, operacion.dec, 'indefinido'); } 
+
     | VAL
-    | VAL tkSInc %prec NEG	                                            { $$ = $1 + $2; }
-    | VAL tkSDec %prec NEG	                                            { $$ = $1 + $2; }
     ;
 
 VAL 
-    : tkNum
-    | tkDec
-    | tkCad
-    | tkCar                                                                 
-    | tkRTru
-    | tkRFal
-    | tkIde
-    | tkIde tkSParAbr tkSParCie                                         { $$ = $1 + $2 + $3; }
-    | tkIde tkSParAbr LISEXP tkSParCie                                  { $$ = $1 + $2 + $3 + $4; }
-    | tkSParAbr EXP tkSParCie                                           { $$ = $1 + $2 + $3; }
+    : tkNum                                                             { $$ = insAPI.val(tipo.int, $1);}
+    | tkDec                                                             { $$ = insAPI.val(tipo.dou, $1);}
+    | tkCad                                                             { $$ = insAPI.val(tipo.str, $1);}
+    | tkCar                                                             { $$ = insAPI.val(tipo.cha, $1);}        
+    | tkRTru                                                            { $$ = insAPI.val(tipo.boo, $1);}
+    | tkRFal                                                            { $$ = insAPI.val(tipo.boo, $1);}
+    | tkIde                                                             { $$ = insAPI.val(tipo.ide, $1);}
+    | tkIde tkSParAbr tkSParCie                                         { $$ = insAPI.llaFun($1,'indefinido'); }
+    | tkIde tkSParAbr LISEXP tkSParCie                                  { $$ = insAPI.llaFun($1, $3); }
+    | tkSParAbr EXP tkSParCie                                           { $$ = $2; }
     ;
 
 LISEXP 
-    : EXP
-    | LISEXP tkSCom EXP                                                 { $$ = $1 + $2 + $3; }    
+    : EXP                                                               { $$ = [$1]; }
+    | LISEXP tkSCom EXP                                                 { $1.push($3); $$ = $1; }    
     ;
 
 // Declaracion Multiple de Parametros                       
@@ -297,11 +342,11 @@ LISPAR
 
 // terminales
 TIP
-    : tkRInt
-    | tkRDou
-    | tkRCha
-    | tkRStr
-    | tkRBoo
+    : tkRInt 
+    | tkRDou 
+    | tkRCha 
+    | tkRStr 
+    | tkRBoo 
     ;
 
 REQ 
