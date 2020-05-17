@@ -19,7 +19,7 @@ function btnAna() {
     })
         .then(res => res.json())
         .catch(error => console.error('Error:', error))
-        .then(response => console.log('respuesta servidor: ', response.val));
+        .then(response => alert(response.var));
 }
 
 function btnAbr() {
@@ -119,7 +119,8 @@ function obtAST() {
             return response.json();
         })
         .then(function (data) {
-            tex.innerHTML = data.val;
+            tex.innerHTML = JSON.stringify(data, null, 2);
+            crearAST(data);
         })
         .catch(function (error) {
             alert('Hubo un problema con la petición Fetch:' + error.message);
@@ -167,3 +168,16 @@ function crePes(nom, cont, nps) {
 }
 
 
+function crearAST(varJson) {
+    $('#arbAST').jstree({
+        'core': {
+            "themes": {
+                "name": "default-dark",
+                "dots": true,
+                "icons": true
+            },
+            'data': varJson
+        }
+
+    });
+}

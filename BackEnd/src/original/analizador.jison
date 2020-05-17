@@ -126,51 +126,51 @@
 
 // Clases y Imports
 S
-    : CLAIMP EOF { console.log($1); return $1; }
+    : CLAIMP EOF { return $1; } //console.log(JSON.stringify($1, null, 2));
     ;
 
 CLAIMP
-    : CLAIMPP
-    |                                                                   { $$ = ''; }
+    : CLAIMPP                                                                             
+    |                                                                   { $$ = 'indefinido'; }
     ;
 
 CLAIMPP
-    : CLAIMPP SINCLAIMP                                                 { $$ = $1 + $2; }
-    | SINCLAIMP
+    : CLAIMPP SINCLAIMP                                                 { $1.push($2); $$ = $1; }
+    | SINCLAIMP                                                         { $$ = [$1]; }
     ;
 
 SINCLAIMP 
-    : tkRCla tkIde tkSLlaAbr MMFV tkSLlaCie                             { $$ = $1 + $2 + $3 + $4 + $5; }
-    | tkRImp ESPIMP tkSPunCom                                           { $$ = $1 + $2 + $3; }
-//    | error REQ                                                         { console.log('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    : tkRCla tkIde tkSLlaAbr MMFV tkSLlaCie                             { $$ = insAPI.cla($2, $4); }
+    | tkRImp ESPIMP tkSPunCom                                           { $$ = insAPI.imp($2); }
+    | error REQ                                                         { console.log('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
     ;
 
 ESPIMP
-    : ESPIMP tkSPun tkIde                                               { $$ = $1 + $2 + $3; }
-    | tkIde                                                             { $$ = $1; }
+    : ESPIMP tkSPun tkIde                                               { $1.push(insAPI.val('identificador',$3)); $$ = $1; }
+    | tkIde                                                             { $$ = [insAPI.val('identificador',$1)]; }
     ;
 
 // Funciones, Metodos, Variables Globales
 MMFV 
-    : MMFVP
-    |                                                                   { $$ = ''; }
+    : MMFVP                                                             
+    |                                                                   { $$ = 'indefinido'; }
     ;
 
 MMFVP
-    : MMFVP SINMMFV                                                     { $$ = $1 + $2; }
-    | SINMMFV
+    : MMFVP SINMMFV                                                     { $1.push($2); $$ = $1; }
+    | SINMMFV                                                           { $$ = [$1]; } 
     ;
 
 SINMMFV
-    : tkRVoi tkRMai tkSParAbr tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; }
-    | tkRVoi tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; }                                           
-    | TIP tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = $1 + $2 + $3 + $4 + $5 + $6 + $7; }                                     
+    : tkRVoi tkRMai tkSParAbr tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = insAPI.mai($6); }
+    | tkRVoi tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = insAPI.met($2, $4, $7); }                                           
+    | TIP tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = insAPI.fun($1, $2, $4, $7); }                                     
     | TIP DECVARMUL tkSPunCom                                           { $$ = insAPI.dec($1, $2); }     
-//    | error REQ                                                         { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error REQ                                                         { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
     ;
 
 INS 
-    : INSP                                                              { console.log(JSON.stringify($1, null, 2)); }
+    : INSP                                                              
     |                                                                   { $$ = 'indefinido'; }
     ;
 
@@ -209,7 +209,7 @@ SININS
     | tkRCon tkSPunCom                                                                              { $$ = insAPI.con(); }
     | tkRRet tkSPunCom                                                                              { $$ = insAPI.ret('indefinido'); }
     | tkRRet EXP tkSPunCom                                                                          { $$ = insAPI.ret($2); }
-//    | error REQ                                                                                     { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error REQ                                                                                     { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
     ;
 
 // asignacion
@@ -331,13 +331,13 @@ LISEXP
 
 // Declaracion Multiple de Parametros                       
 PAR
-    : LISPAR 
-    |                                                                   { $$ = ''; }
+    : LISPAR                                                                              
+    |                                                                   { $$ = 'indefinido'; }
     ;
 
 LISPAR
-    : TIP tkIde                                                         { $$ = $1 + $2; }
-    | LISPAR tkSCom TIP tkIde                                           { $$ = $1 + $2 + $3 + $4; }
+    : TIP tkIde                                                         { $$ = [insAPI.decPar($1, $2)]; }
+    | LISPAR tkSCom TIP tkIde                                           { $1.push(insAPI.decPar($3, $4)); $$ = $1; }
     ;
 
 // terminales

@@ -6,8 +6,7 @@ var cod1 = '', cod2 = '', ast;
 
 router.get('/', (req, res) => {
     ast = ana.parse(cod1);
-    console.log('->' + ast + '<-');
-    res.json({ val: ast });
+    res.json( ast );
 });
 
 router.post('/', (req, res) => {
@@ -20,7 +19,7 @@ router.post('/', (req, res) => {
         cod1 = req.body.val;
         cod2 = '';
     }
-    res.json({ var: "repuesta post" });
+    res.json({ var: "valor recivido" });
 });
 
 module.exports = router;

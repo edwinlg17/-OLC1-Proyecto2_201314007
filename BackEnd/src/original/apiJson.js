@@ -37,6 +37,10 @@ const instruccion = {
   imp: 'import',
   cla: 'class',
 
+  mai: 'main',
+  fun: 'funcion',
+  met: 'metodo',
+
   dec: 'declaracion',
   asi: 'asignacion',
 
@@ -64,6 +68,7 @@ const instruccion = {
 const insAPI = {
   // operacion
   ope: function (valIzq, tip, valDer) {
+
     return {
       val_izq: valIzq,
       tip: tip,
@@ -121,58 +126,62 @@ const insAPI = {
     }
   },
 
+
+  /////////////////////////////////// CONDICIONALES ///////////////////////////////////
   // if
-  if: function(con, ins) {
-		return {
-			tip_ins: instruccion.if,
-			con: con,
-			ins: ins
-		}
+  if: function (con, ins) {
+
+    return {
+      tip_ins: instruccion.if,
+      con: con,
+      ins: ins
+    }
   },
-  
+
   // else if
-  elsif: function(con, ins) {
-		return {
-			tip_ins: instruccion.elsif,
-			con: con,
-			ins: ins
-		}
-	},
+  elsif: function (con, ins) {
+    return {
+      tip_ins: instruccion.elsif,
+      con: con,
+      ins: ins
+    }
+  },
 
   // else
-  els: function(ins) {
-		return {
-			tip_ins: instruccion.els,
-			ins: ins
-		}
+  els: function (ins) {
+    return {
+      tip_ins: instruccion.els,
+      ins: ins
+    }
   },
-  
+
   // switch
-  swi: function(exp, ins) {
-		return {
-			tip_ins: instruccion.swi,
-			exp: exp,
-			ins: ins
-		}
+  swi: function (exp, ins) {
+    return {
+      tip_ins: instruccion.swi,
+      exp: exp,
+      ins: ins
+    }
   },
 
   // case
-  cas: function(exp, ins) {
-		return {
-			tip_ins: instruccion.cas,
-			val: exp,
-			ins: ins
-		}
+  cas: function (exp, ins) {
+    return {
+      tip_ins: instruccion.cas,
+      val: exp,
+      ins: ins
+    }
   },
 
   // def
-  def: function(ins) {
-		return {
-			tip_ins: instruccion.def,
-			ins: ins
-		}
+  def: function (ins) {
+    return {
+      tip_ins: instruccion.def,
+      ins: ins
+    }
   },
 
+  /////////////////////////////////// CICLOS ///////////////////////////////////
   // for
   for: function (vari, con, inc, ins) {
     return {
@@ -185,10 +194,10 @@ const insAPI = {
   },
 
   // while
-  whi: function (exp, ins) {
+  whi: function (con, ins) {
     return {
       tip_ins: instruccion.whi,
-      exp: exp,
+      con: con,
       ins: ins
     };
   },
@@ -220,8 +229,6 @@ const insAPI = {
     };
   },
 
-  
-
   // print
   pri: function (tip, exp) {
     return {
@@ -230,7 +237,59 @@ const insAPI = {
     };
   },
 
+  /////////////////////////////////// METODOS Y FUNCIONES ///////////////////////////////////
+  // main
+  mai: function (ins) {
+    return {
+      tip_ins: instruccion.mai,
+      ins: ins
+    };
+  },
 
+  // met
+  met: function (ide, par, ins) {
+    return {
+      tip_ins: instruccion.met,
+      ide: ide,
+      par: par,
+      ins: ins
+    };
+  },
+
+  // fun
+  fun: function (tip, ide, par, ins) {
+    return {
+      tip_ins: instruccion.fun,
+      tip_ret: tip,
+      ide: ide,
+      par: par,
+      ins: ins
+    };
+  },
+
+  // declaracion de parametros
+  decPar: function (tip, ide) {
+    return {
+      tip: tip,
+      ide: ide
+    };
+  },
+
+  /////////////////////////////////// CLASES FUNCIONES ///////////////////////////////////
+  cla: function (ide, ins) {
+    return {
+      tip_ins: instruccion.cla,
+      ide: ide,
+      ins: ins
+    };
+  },
+
+  imp: function (ide) {
+    return {
+      tip_ins: instruccion.imp,
+      ide: ide
+    };
+  }
 
 }
 
