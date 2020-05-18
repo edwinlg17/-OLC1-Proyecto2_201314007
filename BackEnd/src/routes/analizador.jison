@@ -4,6 +4,8 @@
     const operacion	= require('./apiJson').operacion;
     const insAPI = require('./apiJson').insAPI;
 
+    let err = [];
+
 %}
 
 /* Analizador Lexico */
@@ -131,7 +133,7 @@ S
 
 CLAIMP
     : CLAIMPP                                                                             
-    |                                                                   { $$ = [{text: 'indefinido'}]; }
+    |                                                                   { $$ = [{text: 'indefinido', 'icon': './img/atr.png'}]; }
     ;
 
 CLAIMPP
@@ -142,7 +144,7 @@ CLAIMPP
 SINCLAIMP 
     : tkRCla tkIde tkSLlaAbr MMFV tkSLlaCie                             { $$ = insAPI.cla($2, $4); }
     | tkRImp ESPIMP tkSPunCom                                           { $$ = insAPI.imp($2); }
-    | error REQ                                                         { console.log('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error                                                             { $$ = ''; console.log('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
     ;
 
 ESPIMP
@@ -153,7 +155,7 @@ ESPIMP
 // Funciones, Metodos, Variables Globales
 MMFV 
     : MMFVP                                                             
-    |                                                                   { $$ = [{text: 'indefinido'}]; }
+    |                                                                   { $$ = [{text: 'indefinido', 'icon': './img/atr.png'}]; }
     ;
 
 MMFVP
@@ -166,12 +168,12 @@ SINMMFV
     | tkRVoi tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = insAPI.met($2, $4, $7); }                                           
     | TIP tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = insAPI.fun($1, $2, $4, $7); }                                     
     | TIP DECVARMUL tkSPunCom                                           { $$ = insAPI.dec($1, $2); }     
-    | error REQ                                                         { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error                                                             { $$ = ''; console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
     ;
 
 INS 
     : INSP                                                              
-    |                                                                   { $$ = [{text: 'indefinido'}]; }
+    |                                                                   { $$ = [{text: 'indefinido', 'icon': './img/atr.png'}]; }
     ;
 
 INSP
@@ -193,24 +195,38 @@ SININS
         var a = []; 
         if(Array.isArray($8)){ 
             $8.unshift(insAPI.if($3, $6)); 
-            $$ = $8; 
+            $$ = insAPI.insIf($8); 
         } else { 
             if($8 != '')
                 a.push($8);
             a.unshift(insAPI.if($3, $6)); 
-            $$ = a; 
+            $$ = insAPI.insIf(a); 
         } 
     }
-    | tkRSwi tkSParAbr EXP tkSParCie tkSLlaAbr CAS tkSLlaCie                                        { $$ = insAPI.swi($3, $6); }
+    | tkRSwi tkSParAbr EXP tkSParCie tkSLlaAbr CAS tkSLlaCie                                        { 
+        if(Array.isArray($6)){ 
+            $$ = insAPI.swi($3, $6);
+        } else { 
+            if($6 == '')
+                $$ = insAPI.swi($3, [{text: 'indefinido', 'icon': './img/atr.png'}]);
+                else
+                $$ = insAPI.swi($3, [$6]);
+            
+        }
+     }
     | tkRFor tkSParAbr DECASI tkSPunCom EXP tkSPunCom ASIINC tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = insAPI.for($3, $5, $7, $10); }
     | tkRWhi tkSParAbr EXP tkSParCie tkSLlaAbr INS tkSLlaCie                                        { $$ = insAPI.whi($3, $6);  }   
     | tkRDo tkSLlaAbr INS tkSLlaCie tkRWhi tkSParAbr EXP tkSParCie tkSPunCom                        { $$ = insAPI.do($7, $3); }           
+    | tkIde tkSParAbr tkSParCie tkSPunCom                                                           { $$ = insAPI.llaFun($1,[{text: 'indefinido', 'icon': './img/atr.png'}]); }
+    | tkIde tkSParAbr LISEXP tkSParCie tkSPunCom                                                    { $$ = insAPI.llaFun($1, $3); }
     | tkRBre tkSPunCom                                                                              { $$ = insAPI.bre(); }
     | tkRCon tkSPunCom                                                                              { $$ = insAPI.con(); }
-    | tkRRet tkSPunCom                                                                              { $$ = insAPI.ret('indefinido'); }
+    | tkRRet tkSPunCom                                                                              { $$ = insAPI.ret({text: 'indefinido', 'icon': './img/atr.png'}); }
     | tkRRet EXP tkSPunCom                                                                          { $$ = insAPI.ret($2); }
-    | error REQ                                                                                     { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error                                                                                         { $$ = ''; err.push({err:'Error Sintactico', lin:this._$.first_line, col: this._$.first_column}); console.error('Este es un error sintáctico: ' +yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+//    | error REQ                                                                                     { $$ = ''; err.push({err:'Error Sintactico', lin:this._$.first_line, col: this._$.first_column}); console.error('Este es un error sintáctico: ' +yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
     ;
+
 
 // asignacion
 DECASI
@@ -249,7 +265,7 @@ SINELS
 // case
 CAS 
     : CASP 
-    |                                                                   { $$ = 'indefinido'; }
+    |                                                                   { $$ = ''; }
     ;
 
 CASP		
@@ -259,7 +275,7 @@ CASP
             $5.unshift(insAPI.cas($2, $4)); 
             $$ = $5; 
         } else { 
-            if($5 != 'indefinido')
+            if($5 != '')
                 a.push($5);
             a.unshift(insAPI.cas($2, $4)); 
             $$ = a; 
@@ -281,7 +297,7 @@ DECVARMUL
     ;
 
 SINVAR
-    : tkIde                                                             { $$ = insAPI.nueVar($1, 'indefinido'); }
+    : tkIde                                                             { $$ = insAPI.nueVar($1, {text: 'indefinido', 'icon': './img/atr.png'}); }
     | tkIde tkSIgu EXP                                                  { $$ = insAPI.nueVar($1, $3); }
     ;
 
@@ -291,8 +307,8 @@ EXP
 
     | EXP tkSDIgu EXP                                                   { $$ = insAPI.ope($1, operacion.igu, $3); } 
     | EXP tkSMay EXP                                                    { $$ = insAPI.ope($1, operacion.may, $3); } 
-    | EXP tkSMayIgu EXP                                                 { $$ = insAPI.ope($1, operacion.men, $3); }
-    | EXP tkSMen EXP                                                    { $$ = insAPI.ope($1, operacion.mayigu, $3); }
+    | EXP tkSMayIgu EXP                                                 { $$ = insAPI.ope($1, operacion.mayigu, $3); }
+    | EXP tkSMen EXP                                                    { $$ = insAPI.ope($1, operacion.men, $3); }
     | EXP tkSMenIgu EXP                                                 { $$ = insAPI.ope($1, operacion.menigu, $3); } 
     | EXP tkSDif EXP                                                    { $$ = insAPI.ope($1, operacion.dif, $3); } 
     
@@ -303,10 +319,10 @@ EXP
 	| EXP tkSPot EXP                                                    { $$ = insAPI.ope($1, operacion.pot, $3); }
 	| EXP tkSMod EXP                                                    { $$ = insAPI.ope($1, operacion.mod, $3); }
 
-	| tkSGui EXP %prec NEG	                                            { $$ = insAPI.ope('indefinido', $2, operacion.neg); } 
-    | tkSAdm EXP %prec NEG	                                            { $$ = insAPI.ope('indefinido', $2, operacion.not); } 
-    | VAL tkSInc %prec NEG	                                            { $$ = insAPI.ope($1, operacion.inc, 'indefinido'); } 
-    | VAL tkSDec %prec NEG	                                            { $$ = insAPI.ope($1, operacion.dec, 'indefinido'); } 
+	| tkSGui EXP %prec NEG	                                            { $$ = insAPI.opeUna( operacion.neg, $2 ); } 
+    | tkSAdm EXP %prec NEG	                                            { $$ = insAPI.opeUna( operacion.not, $2 ); } 
+    | VAL tkSInc %prec NEG	                                            { $$ = insAPI.opeUna( operacion.inc, $1 ); } 
+    | VAL tkSDec %prec NEG	                                            { $$ = insAPI.opeUna( operacion.dec, $1 ); } 
 
     | VAL
     ;
@@ -319,7 +335,7 @@ VAL
     | tkRTru                                                            { $$ = insAPI.val(tipo.boo, $1);}
     | tkRFal                                                            { $$ = insAPI.val(tipo.boo, $1);}
     | tkIde                                                             { $$ = insAPI.val(tipo.ide, $1);}
-    | tkIde tkSParAbr tkSParCie                                         { $$ = insAPI.llaFun($1,'indefinido'); }
+    | tkIde tkSParAbr tkSParCie                                         { $$ = insAPI.llaFun($1,[{text: 'indefinido', 'icon': './img/atr.png'}]); }
     | tkIde tkSParAbr LISEXP tkSParCie                                  { $$ = insAPI.llaFun($1, $3); }
     | tkSParAbr EXP tkSParCie                                           { $$ = $2; }
     ;

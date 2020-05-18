@@ -23,7 +23,8 @@ func main(){
 	http.Handle("/color/", http.StripPrefix("/color/", http.FileServer(http.Dir("templates/color/"))))
 	http.Handle("/ico/", http.StripPrefix("/ico/", http.FileServer(http.Dir("templates/ico/"))))
 	http.Handle("/js/dist/", http.StripPrefix("/js/dist/", http.FileServer(http.Dir("templates/js/dist/"))))
-	http.Handle("/js/dist/themes/default/", http.StripPrefix("/js/dist/themes/default-dark/", http.FileServer(http.Dir("templates/js/dist/themes/default-dark/"))))
+	http.Handle("/js/dist/themes/default/", http.StripPrefix("/js/dist/themes/default/", http.FileServer(http.Dir("templates/js/dist/themes/default//"))))
+	http.Handle("/js/dist/themes/default-dark/", http.StripPrefix("/js/dist/themes/default-dark/", http.FileServer(http.Dir("templates/js/dist/themes/default-dark/"))))
 
 	http.HandleFunc("/", index)
 	fmt.Println("servidor activo")

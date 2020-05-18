@@ -169,6 +169,9 @@ function crePes(nom, cont, nps) {
 
 
 function crearAST(varJson) {
+    // limpio el arbol
+    $('#arbAST').jstree("destroy").empty();
+    // asigno la data
     $('#arbAST').jstree({
         'core': {
             "themes": {
@@ -178,6 +181,5 @@ function crearAST(varJson) {
             },
             'data': varJson
         }
-
     });
 }
