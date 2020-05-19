@@ -32,6 +32,8 @@
 }
 
 .input-block-level {
+  background-color: #333333;
+  color: #d0d3d4;
   display: block;
   width: 100%;
   min-height: 30px;

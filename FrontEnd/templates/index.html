@@ -57,7 +57,8 @@
                 <nav>
                   <ul class="nav topnav">
 
-                    <li><a href="#" onclick="btnAna()">Analizar</a></li>
+                    <li><a href="#" onclick="btnAna1()">Archivo 1</a></li>
+                    <li><a href="#" onclick="btnAna2()">Archivo 2</a></li>
 
                     <li class="dropdown">
                       <a href="#">Archivo <i class="icon-angle-down"></i></a>
@@ -72,10 +73,10 @@
                     <li class="dropdown">
                       <a href="#">Reportes <i class="icon-angle-down"></i></a>
                       <ul class="dropdown-menu">
-                        <li><a href="#" onclick="btnRepLex()">Reporte Errores </a></li>
-                        <li><a href="#">Reporte Clases Copia </a></li>
-                        <li><a href="#">Reporte Funciones Copia</a></li>
-                        <li><a href="#">Reporte Variables Copia</a></li>
+                        <li><a href="#" id="repHTML" onclick="btnRepHTML()">Reporte Errores HTML</a></li>
+                        <li><a href="#" onclick="btnRepClaCop()">Reporte Clases Copia </a></li>
+                        <li><a href="#" onclick="btnRepFunCop()">Reporte Funciones Copia</a></li>
+                        <li><a href="#" onclick="btnRepVarCop()">Reporte Variables Copia</a></li>
                         <li><a href="#" onclick="obtAST()">Reporte AST</a></li>
                       </ul>
                     </li>
@@ -111,7 +112,7 @@
                 <div class="tab-content" id="con">
 
                   <div class="tab-pane active" id="0">
-                    <textarea rows="10" id="t0" type="email" wrap="off" name="texto" class="input-block-level"
+                    <textarea rows="20" id="t0" type="email" wrap="off" name="texto" class="input-block-level"
                       placeholder="* Codigo..."></textarea>
                   </div>
 
@@ -135,17 +136,17 @@
                 <div class="tab-content">
 
                   <div class="tab-pane active" id="psal">
-                    <textarea id="tSal" rows="5" name="message" class="input-block-level" placeholder="* Salida..."
+                    <textarea id="tSal" rows="10" name="message" class="input-block-level" placeholder="* Salida..."
                       data-rule="required" data-msg="Please write something"></textarea>
                   </div>
 
                   <div class="tab-pane" id="plex">
-                    <textarea rows="5" name="message" class="input-block-level" placeholder="* Errores Lexicos..."
+                    <textarea id="tLex" rows="10" name="message" class="input-block-level" placeholder="* Errores Lexicos..."
                       data-rule="required" data-msg="Please write something"></textarea>
                   </div>
 
                   <div class="tab-pane" id="psin">
-                    <textarea rows="5" name="message" class="input-block-level" placeholder="* Errores Sintacticos..."
+                    <textarea id="tSin" rows="10" name="message" class="input-block-level" placeholder="* Errores Sintacticos..."
                       data-rule="required" data-msg="Please write something"></textarea>
                   </div>
 

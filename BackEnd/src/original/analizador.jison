@@ -126,7 +126,7 @@
 
 // Clases y Imports
 S
-    : CLAIMP EOF { return $1; } //console.log(JSON.stringify($1, null, 2));
+    : CLAIMP EOF { console.log(JSON.stringify($1, null, 2)); return $1; } //console.log(JSON.stringify($1, null, 2));
     ;
 
 CLAIMP
@@ -142,7 +142,7 @@ CLAIMPP
 SINCLAIMP 
     : tkRCla tkIde tkSLlaAbr MMFV tkSLlaCie                             { $$ = insAPI.cla($2, $4); }
     | tkRImp ESPIMP tkSPunCom                                           { $$ = insAPI.imp($2); }
-    | error REQ                                                         { console.log('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error                                                             { $$ = ''; }
     ;
 
 ESPIMP
@@ -166,7 +166,7 @@ SINMMFV
     | tkRVoi tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = insAPI.met($2, $4, $7); }                                           
     | TIP tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = insAPI.fun($1, $2, $4, $7); }                                     
     | TIP DECVARMUL tkSPunCom                                           { $$ = insAPI.dec($1, $2); }     
-    | error REQ                                                         { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error                                                             { $$ = ''; }
     ;
 
 INS 
@@ -187,7 +187,7 @@ INSP
 
 SININS 
     : TIP DECVARMUL tkSPunCom                                                                       { $$ = insAPI.dec($1, $2); }  
-    | tkIde tkSIgu EXP tkSPunCom                                                                    { $$ = insAPI.asi($1, $3); }
+    | tkIde tkSIgu EXP tkSPunCom                                                                    { $$ = insAPI.asi($1, $3); } 
     | tkRSis tkSPun tkROut tkSPun PRI tkSParAbr EXP tkSParCie tkSPunCom                             { $$ = insAPI.pri($5, $7); }   
     | tkRIf tkSParAbr EXP tkSParCie tkSLlaAbr INS tkSLlaCie ELS                                     { 
         var a = []; 
@@ -209,7 +209,7 @@ SININS
     | tkRCon tkSPunCom                                                                              { $$ = insAPI.con(); }
     | tkRRet tkSPunCom                                                                              { $$ = insAPI.ret('indefinido'); }
     | tkRRet EXP tkSPunCom                                                                          { $$ = insAPI.ret($2); }
-    | error REQ                                                                                     { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error                                                                                         { $$ = ''; }
     ;
 
 // asignacion

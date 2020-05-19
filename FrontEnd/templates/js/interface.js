@@ -1,12 +1,68 @@
 np = 0;
 
-function btnAna() {
+// archivo
+function btnAna1() {
     con = document.getElementsByClassName("tab-pane active");
     ele = con[0];
     ide = ele.id;
     tex = document.getElementById("t" + ide).value;
 
-    var url = 'http://localhost:8000/api/analizar';
+    var url = 'http://localhost:8000/api/analizar/archivo1';
+
+    var data = ({ val: tex });
+
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res => res.json())
+        .catch(error => console.error('Error:', error))
+        .then(response => alert(response.var));
+
+    // errores lexicos
+    var tLex = document.getElementById('tLex');
+
+    var url = 'http://localhost:8000/api/analizar/errLexCon';
+
+    fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            tLex.innerHTML = obtErr(data); //JSON.stringify(data, null, 2);
+        })
+        .catch(function (error) {
+            alert('Hubo un problema con la petición Fetch:' + error.message);
+        });
+
+    // errores sintacticos
+    var tSin = document.getElementById('tSin');
+
+    var url = 'http://localhost:8000/api/analizar/errSinCon';
+
+    fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            tSin.innerHTML = obtErr(data);
+        })
+        .catch(function (error) {
+            alert('Hubo un problema con la petición Fetch:' + error.message);
+        });
+
+}
+
+function btnAna2() {
+    con = document.getElementsByClassName("tab-pane active");
+    ele = con[0];
+    ide = ele.id;
+    tex = document.getElementById("t" + ide).value;
+
+    var url = 'http://localhost:8000/api/analizar/archivo2';
 
     var data = ({ val: tex });
 
@@ -96,23 +152,46 @@ function btnGuaCom() {
     }
 }
 
-function btnRepLex() {
-
-}
-
-function btnRepSin() {
-
-}
-
 function btnNuePes() {
     np++;
     crePes("nuevo " + np + " ", "", np);
 }
 
+// reportes
+function btnRepHTML() {
+
+    var url = 'http://localhost:8000/api/analizar/repHTML';
+
+    fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            genHTML(data);
+        })
+        .catch(function (error) {
+            alert('Hubo un problema con la petición Fetch:' + error.message);
+        });
+
+    
+}
+
+function btnRepClaCop() {
+
+}
+
+function btnRepFunCop() {
+
+}
+
+function btnRepVarCop() {
+
+}
+
 function obtAST() {
     var tex = document.getElementById('tSal');
 
-    var url = 'http://localhost:8000/api/analizar';
+    var url = 'http://localhost:8000/api/analizar/repAST';
 
     fetch(url)
         .then(function (response) {
@@ -127,6 +206,7 @@ function obtAST() {
         });
 }
 
+// otras funciones
 function crePes(nom, cont, nps) {
     // titulo etiqueta
     pes = document.getElementById("pes");
@@ -155,7 +235,7 @@ function crePes(nom, cont, nps) {
     ntex = document.createElement('textarea');
     ntex.setAttribute("id", "t" + nps);
     ntex.setAttribute("name", "texto");
-    ntex.setAttribute("rows", "10");
+    ntex.setAttribute("rows", "20");
     ntex.setAttribute("class", "input-block-level");
     ntex.setAttribute("type", "email");
     ntex.setAttribute("wrap", "off");
@@ -166,7 +246,6 @@ function crePes(nom, cont, nps) {
     con.appendChild(ndiv);
 
 }
-
 
 function crearAST(varJson) {
     // limpio el arbol
@@ -182,4 +261,54 @@ function crearAST(varJson) {
             'data': varJson
         }
     });
+}
+
+function obtErr(lisJSON) {
+    var tex = '';
+    lisJSON.forEach(varJSON => {
+        tex += varJSON.err + ' ' + varJSON.lex + ' en la linea: ' + varJSON.lin + ' en la columna: ' + varJSON.col + '\n';
+    });
+    return tex;
+}
+
+function genHTML(lisJSON) {
+    var tex = '', tab = '', inc = 1;
+
+    lisJSON.forEach(varJSON => {
+        tab += '<tr>' + '<td>' + inc + '</td>' + '<td>' + varJSON.err + '</td>' + '<td>' + varJSON.lex + '</td>' + '<td>' + varJSON.lin + '</td>' + '<td>' + varJSON.col + '</td>' + '</tr >';
+        inc++;
+    });
+
+    tex += '<!DOCTYPE html>'
+        + '<html>'
+        + '<head>'
+        + '<title>Tabla de Errores</title>'
+        + '<style>'
+        + 'table { border-collapse: collapse; width: 100%; }'
+        + 'th, td { text-align: left; padding: 8px; }'
+        + 'tr:nth-child(even) { background-color: #f2f2f2; }'
+        + 'th { background-color: #333333; color: white; }'
+        + '</style>'
+        + '</head>'
+        + '<body>'
+        + '<h2>Reporte de Errores</h2>'
+        + '<table>'
+        + '<tr>'
+        + '<th>No.</th>'
+        + '<th>Tipo</th>'
+        + '<th>Lexema</th>'
+        + '<th>Fila</th>'
+        + '<th>Columna</th>'
+        + '</tr>'
+        + tab
+        + '</table>'
+        + '</body>'
+        + '</html>';
+
+
+
+    let nom = "Reporte_HTML.html";
+    let elem = document.getElementById('repHTML');
+    elem.download = nom;
+    elem.href = "data:application/octet-stream," + encodeURIComponent(tex);
 }

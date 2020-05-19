@@ -4,8 +4,12 @@
     const operacion	= require('./apiJson').operacion;
     const insAPI = require('./apiJson').insAPI;
 
-    let err = [];
+    let err = [], errLex = [], errSin = [];
 
+    exports.lim = function(){ err = [], errLex = [], errSin = []; };
+    exports.err = function(){ return err; };
+    exports.errLex = function(){ return errLex; };
+    exports.errSin = function(){ return errSin; };
 %}
 
 /* Analizador Lexico */
@@ -107,7 +111,7 @@
 <<EOF>>				    return 'EOF';       // fin del archivo
 
 // Error Lexico
-.	                    { console.log('Error Lexico: ' + yytext + ', en la linea: ' + yylloc.first_line + ', en la columna: ' + yylloc.first_column); }
+.	                    { err.push({err: 'Error Lexico', lex: yytext, lin: yylloc.first_line, col: yylloc.first_column}); errLex.push({err: 'Error Lexico', lex: yytext, lin: yylloc.first_line, col: yylloc.first_column});}
 
 /lex
 
@@ -137,14 +141,23 @@ CLAIMP
     ;
 
 CLAIMPP
-    : CLAIMPP SINCLAIMP                                                 { $1.push($2); $$ = $1; }
-    | SINCLAIMP                                                         { $$ = [$1]; }
+    : CLAIMPP SINCLAIMP                                                 { 
+        if($2 != ''){
+            $1.push($2);
+        }
+        $$ = $1; }
+    | SINCLAIMP                                                         { 
+        if($1 != '')
+            {$$ = [$1];}
+        else
+            {$$ = [];}
+        }
     ;
 
 SINCLAIMP 
     : tkRCla tkIde tkSLlaAbr MMFV tkSLlaCie                             { $$ = insAPI.cla($2, $4); }
     | tkRImp ESPIMP tkSPunCom                                           { $$ = insAPI.imp($2); }
-    | error                                                             { $$ = ''; console.log('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error                                                             { $$ = ''; err.push({err:'Error Sintactico', lex:yytext, lin:this._$.first_line, col: this._$.first_column}); errSin.push({err: 'Error Sintactico', lex: yytext, lin: this._$.first_line, col: this._$.first_column}); }
     ;
 
 ESPIMP
@@ -159,8 +172,18 @@ MMFV
     ;
 
 MMFVP
-    : MMFVP SINMMFV                                                     { $1.push($2); $$ = $1; }
-    | SINMMFV                                                           { $$ = [$1]; } 
+    : MMFVP SINMMFV                                                     { 
+        if($2 != ''){
+            $1.push($2);
+        }
+        $$ = $1; 
+        }
+    | SINMMFV                                                           { 
+        if($1 != '')
+            {$$ = [$1];}
+        else
+            {$$ = [];}
+        } 
     ;
 
 SINMMFV
@@ -168,7 +191,7 @@ SINMMFV
     | tkRVoi tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie      { $$ = insAPI.met($2, $4, $7); }                                           
     | TIP tkIde tkSParAbr PAR tkSParCie tkSLlaAbr INS tkSLlaCie         { $$ = insAPI.fun($1, $2, $4, $7); }                                     
     | TIP DECVARMUL tkSPunCom                                           { $$ = insAPI.dec($1, $2); }     
-    | error                                                             { $$ = ''; console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error                                                             { $$ = ''; err.push({err: 'Error Sintactico', lex: yytext, lin: this._$.first_line, col: this._$.first_column}); errSin.push({err: 'Error Sintactico', lex: yytext, lin: this._$.first_line, col: this._$.first_column}); }
     ;
 
 INS 
@@ -177,12 +200,20 @@ INS
     ;
 
 INSP
-    : INSP SININS                                                       { $1.push($2); $$ = $1; }
+    : INSP SININS                                                       { 
+        if($2 != ''){
+            $1.push($2);
+        }
+        $$ = $1; 
+        }
     | SININS                                                            { 
         if(Array.isArray($1)) { 
             $$ = $1; 
         } else { 
-            $$ = [$1]; 
+            if($1 != '')
+                {$$ = [$1]; }
+            else
+                {$$ = [];}
         } 
     } 
     ;
@@ -223,8 +254,11 @@ SININS
     | tkRCon tkSPunCom                                                                              { $$ = insAPI.con(); }
     | tkRRet tkSPunCom                                                                              { $$ = insAPI.ret({text: 'indefinido', 'icon': './img/atr.png'}); }
     | tkRRet EXP tkSPunCom                                                                          { $$ = insAPI.ret($2); }
-    | error                                                                                         { $$ = ''; err.push({err:'Error Sintactico', lin:this._$.first_line, col: this._$.first_column}); console.error('Este es un error sintáctico: ' +yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
-//    | error REQ                                                                                     { $$ = ''; err.push({err:'Error Sintactico', lin:this._$.first_line, col: this._$.first_column}); console.error('Este es un error sintáctico: ' +yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+    | error                                                                                         { 
+        $$ = ''; 
+        err.push({err: 'Error Sintactico', lex: yytext, lin: this._$.first_line, col: this._$.first_column}); 
+        errSin.push({err: 'Error Sintactico', lex: yytext, lin: this._$.first_line, col: this._$.first_column}); 
+        }
     ;
 
 
