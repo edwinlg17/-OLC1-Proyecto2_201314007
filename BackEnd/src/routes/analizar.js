@@ -1,36 +1,49 @@
 const { Router } = require('express');
 const router = Router();
+const ana = require('./analizador');
+const rep = require('./apiAna');
 
-
-let cod1 = '', cod2 = '', ast1, ast2, repAST;
+let cod1 = '', cod2 = '', repAST;
 let err = [], errLex = [], errSin = [];
 
-// get reporte ast
-router.get('/repAST', (req, res) => {
-    res.json( repAST );
-});
-
+//////////////////////// ERRORES GET
 // get errores lexico
 router.get('/errLexCon', (req, res) => {
-    res.json( errLex );
+    res.json(errLex);
 });
 
 // get errores sintacticos
 router.get('/errSinCon', (req, res) => {
-    res.json( errSin );
+    res.json(errSin);
 });
 
+//////////////////////// REPORTES GET
 // get reporte html
 router.get('/repHTML', (req, res) => {
-    res.json( err );
+    res.json(err);
 });
 
+// get reporte clase copia
+router.get('/repClaCop', (req, res) => {
+    res.json({ rep: rep.repCalCop(cod1, cod2) });
+});
+
+// get reporte funciones/metodos copia
+router.get('/repFunCop', (req, res) => {
+    res.json({ rep: rep.repFunCop(cod1, cod2) });
+});
+
+// get reporte ast
+router.get('/repAST', (req, res) => {
+    res.json(repAST);
+});
+
+//////////////////////// ARCHIVOS POST
+// archivo 1
 router.post('/archivo1', (req, res) => {
     cod1 = req.body.val;
-    // ast comparacion
+    // reportes 
 
-    // reportes
-    const ana = require('./analizador');
     ana.lim();
     repAST = ana.parse(cod1);
     err = ana.err(); // reporte html
@@ -39,12 +52,12 @@ router.post('/archivo1', (req, res) => {
     res.json({ var: "archivo 1 recivido" });
 });
 
+// archivo 2
 router.post('/archivo2', (req, res) => {
     cod2 = req.body.val;
-    // ast comparacion
-    const ana = require('./analizador');
-    ast2 = ana.parse(cod2);
     res.json({ var: "archivo 2 recivido" });
 });
 
+
+//////////////////////// EXPORTS
 module.exports = router;

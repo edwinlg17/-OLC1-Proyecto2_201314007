@@ -173,15 +173,43 @@ function btnRepHTML() {
             alert('Hubo un problema con la petición Fetch:' + error.message);
         });
 
-    
+
 }
 
 function btnRepClaCop() {
+    var tSal = document.getElementById('tSal');
+    tSal.innerHTML = '';
 
+    var url = 'http://localhost:8000/api/analizar/repClaCop';
+
+    fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            tSal.innerHTML = data.rep;
+        })
+        .catch(function (error) {
+            alert('Hubo un problema con la petición Fetch:' + error.message);
+        });
 }
 
 function btnRepFunCop() {
+    var tSal = document.getElementById('tSal');
+    tSal.innerHTML = '';
 
+    var url = 'http://localhost:8000/api/analizar/repFunCop';
+
+    fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            tSal.innerHTML = data.rep;
+        })
+        .catch(function (error) {
+            alert('Hubo un problema con la petición Fetch:' + error.message);
+        });
 }
 
 function btnRepVarCop() {
