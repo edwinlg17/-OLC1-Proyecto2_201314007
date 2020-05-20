@@ -213,7 +213,21 @@ function btnRepFunCop() {
 }
 
 function btnRepVarCop() {
+    var tSal = document.getElementById('tSal');
+    tSal.innerHTML = '';
 
+    var url = 'http://localhost:8000/api/analizar/repVarCop';
+
+    fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            tSal.innerHTML = data.rep;
+        })
+        .catch(function (error) {
+            alert('Hubo un problema con la petición Fetch:' + error.message);
+        });
 }
 
 function obtAST() {

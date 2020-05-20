@@ -43,7 +43,6 @@ var repCalCop = function (tex1, tex2) {
                         }
                     }
                 });
-                console.log(verMMF + ' ' + canmei + ' ' + canmet + ' ' + canfun);
                 if (verMMF) {
                     ret += 'No. ' + con++ + ', clase: ' + ele.ide + ' => # main: ' + canmei + ', # metodos: ' + canmet + ', # funciones: ' + canfun + '\n';
                 }
@@ -84,12 +83,88 @@ var repFunCop = function (tex1, tex2) {
     return ret;
 }
 
-var obtLisPar = function (vec) {
-    let par = '';
-    vec.forEach(ele => {
-        par += ele.tip + ' ' + ele.ide + ' - ';
+// reporte variables copia
+var repVarCop = function (tex1, tex2) {
+    let ast1 = ana1.parse(tex1);
+    let ast2 = ana2.parse(tex2);
+
+    let ret = '////////////// Reporte Variables Copia //////////////\n';
+
+    let con = 0;
+    ast1.forEach(ele => {
+        if (ele.tip_ins == ins.cla) {
+            var cla = busCla(ast2, ele.ide);
+            if (cla) {
+                ele.ins.forEach(mmf => {
+                    if (mmf.tip_ins == ins.mai) {
+                        let mtem = busMai(cla.ins, mmf.tip_ins);
+                        if (mtem) {
+                            mtem.ins.forEach(tdec => {
+                                if (tdec.tip_ins == ins.dec) {
+                                    tdec.var.forEach(tvar => {
+                                        if (busVar(mtem.ins, tdec.tip, tvar.ide)) {
+                                            ret += 'No. ' + con++ + ', tipo: ' + tdec.tip + ', nombre: ' + tvar.ide + ', fun/met: main, clase: ' + ele.ide + '\n';
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    } else if (mmf.tip_ins == ins.met) {
+                        let mtem = busMet(cla.ins, mmf.tip_ins, mmf.ide, mmf.par);
+                        if (mtem) {
+                            mtem.ins.forEach(tdec => {
+                                if (tdec.tip_ins == ins.dec) {
+                                    tdec.var.forEach(tvar => {
+                                        if (busVar(mtem.ins, tdec.tip, tvar.ide)) {
+                                            ret += 'No. ' + con++ + ', tipo: ' + tdec.tip + ', nombre: ' + tvar.ide + ', fun/met: ' + mtem.ide + ', clase: ' + ele.ide + '\n';
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    } else if (mmf.tip_ins == ins.fun) {
+                        let ftem = busFun(cla.ins, mmf.tip_ins, mmf.tip_ret, mmf.ide, mmf.par);
+                        if (ftem) {
+                            ftem.ins.forEach(tdec => {
+                                if (tdec.tip_ins == ins.dec) {
+                                    tdec.var.forEach(tvar => {
+                                        if (busVar(ftem.ins, tdec.tip, tvar.ide)) {
+                                            ret += 'No. ' + con++ + ', tipo: ' + tdec.tip + ', nombre: ' + tvar.ide + ', fun/met: ' + ftem.ide + ', clase: ' + ele.ide + '\n';
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    } else if (mmf.tip_ins == ins.dec) {
+                        mmf.var.forEach(tvar => {
+                            if (busVar(cla.ins, mmf.tip, tvar.ide)) {
+                                ret += 'No. ' + con++ + ', tipo: ' + mmf.tip + ', nombre: ' + tvar.ide + ', fun/met: Global, clase: ' + ele.ide + '\n';
+                            }
+                        });
+                    }
+
+                });
+            }
+        }
     });
-    return par;
+
+    return ret;
+}
+
+var busVar = function (vec, tip, nom) {
+    let tvar = false;
+    vec.forEach(ele => {
+        if (ele.tip_ins == ins.dec) {
+            if (ele.tip == tip) {
+                ele.var.forEach(lide => {
+                    if (lide.ide == nom) {
+                        tvar = true;
+                    }
+                });
+            }
+        }
+    });
+    return tvar;
 }
 
 var busCla = function (vec, nom) {
@@ -105,22 +180,22 @@ var busCla = function (vec, nom) {
 }
 
 var busMai = function (vec, tip) {
-    let mmf = false;
+    let mmf = null;
     vec.forEach(ele => {
         if (ele.tip_ins == tip) {
-            mmf = true;
+            mmf = ele;
         }
     });
     return mmf;
 }
 
 var busMet = function (vec, tip, nom, par) {
-    let mmf = false;
+    let mmf = null;
     vec.forEach(ele => {
         if (ele.tip_ins == tip) {
             if (ele.ide == nom) {
                 if (verPar(ele.par, par)) {
-                    mmf = true;
+                    mmf = ele;
                 }
             }
         }
@@ -129,13 +204,13 @@ var busMet = function (vec, tip, nom, par) {
 }
 
 var busFun = function (vec, tip, ret, nom, par) {
-    let mmf = false;
+    let mmf = null;
     vec.forEach(ele => {
         if (ele.tip_ins == tip) {
             if (ele.tip_ret == ret) {
                 if (ele.ide == nom) {
                     if (verPar(ele.par, par)) {
-                        mmf = true;
+                        mmf = ele;
                     }
                 }
             }
@@ -158,6 +233,14 @@ var verPar = function (vec1, vec2) {
     return par;
 }
 
+var obtLisPar = function (vec) {
+    let par = '';
+    vec.forEach(ele => {
+        par += ele.tip + ' ' + ele.ide + ' - ';
+    });
+    return par;
+}
+
 //////////////////////// exports
 exports.repCalCop = function (tex1, tex2) {
     return repCalCop(tex1, tex2);
@@ -165,4 +248,8 @@ exports.repCalCop = function (tex1, tex2) {
 
 exports.repFunCop = function (tex1, tex2) {
     return repFunCop(tex1, tex2);
+};
+
+exports.repVarCop = function (tex1, tex2) {
+    return repVarCop(tex1, tex2);
 };

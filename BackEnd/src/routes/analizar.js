@@ -33,6 +33,11 @@ router.get('/repFunCop', (req, res) => {
     res.json({ rep: rep.repFunCop(cod1, cod2) });
 });
 
+// get reporte funciones/metodos copia
+router.get('/repVarCop', (req, res) => {
+    res.json({ rep: rep.repVarCop(cod1, cod2) });
+});
+
 // get reporte ast
 router.get('/repAST', (req, res) => {
     res.json(repAST);
@@ -43,7 +48,6 @@ router.get('/repAST', (req, res) => {
 router.post('/archivo1', (req, res) => {
     cod1 = req.body.val;
     // reportes 
-
     ana.lim();
     repAST = ana.parse(cod1);
     err = ana.err(); // reporte html
@@ -57,7 +61,6 @@ router.post('/archivo2', (req, res) => {
     cod2 = req.body.val;
     res.json({ var: "archivo 2 recivido" });
 });
-
 
 //////////////////////// EXPORTS
 module.exports = router;
