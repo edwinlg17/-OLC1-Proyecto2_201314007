@@ -99,7 +99,7 @@ var repVarCop = function (tex1, tex2) {
                     if (mmf.tip_ins == ins.mai) {
                         let mtem = busMai(cla.ins, mmf.tip_ins);
                         if (mtem) {
-                            mtem.ins.forEach(tdec => {
+                            mmf.ins.forEach(tdec => {
                                 if (tdec.tip_ins == ins.dec) {
                                     tdec.var.forEach(tvar => {
                                         if (busVar(mtem.ins, tdec.tip, tvar.ide)) {
@@ -113,7 +113,7 @@ var repVarCop = function (tex1, tex2) {
                     } else if (mmf.tip_ins == ins.met) {
                         let mtem = busMet(cla.ins, mmf.tip_ins, mmf.ide, mmf.par);
                         if (mtem) {
-                            mtem.ins.forEach(tdec => {
+                            mmf.ins.forEach(tdec => {
                                 if (tdec.tip_ins == ins.dec) {
                                     tdec.var.forEach(tvar => {
                                         if (busVar(mtem.ins, tdec.tip, tvar.ide)) {
@@ -127,7 +127,7 @@ var repVarCop = function (tex1, tex2) {
                     } else if (mmf.tip_ins == ins.fun) {
                         let ftem = busFun(cla.ins, mmf.tip_ins, mmf.tip_ret, mmf.ide, mmf.par);
                         if (ftem) {
-                            ftem.ins.forEach(tdec => {
+                            mmf.ins.forEach(tdec => {
                                 if (tdec.tip_ins == ins.dec) {
                                     tdec.var.forEach(tvar => {
                                         if (busVar(ftem.ins, tdec.tip, tvar.ide)) {
