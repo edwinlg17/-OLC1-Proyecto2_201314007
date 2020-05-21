@@ -23,7 +23,7 @@ function btnAna1() {
         .then(response => alert(response.var));
 
     // errores lexicos
-    var tLex = document.getElementById('tLex');
+    var tLex = document.getElementById('tabLex');
 
     var url = 'http://localhost:8000/api/analizar/errLexCon';
 
@@ -39,7 +39,7 @@ function btnAna1() {
         });
 
     // errores sintacticos
-    var tSin = document.getElementById('tSin');
+    var tSin = document.getElementById('tabSin');
 
     var url = 'http://localhost:8000/api/analizar/errSinCon';
 
@@ -177,9 +177,6 @@ function btnRepHTML() {
 }
 
 function btnRepClaCop() {
-    var tSal = document.getElementById('tSal');
-    tSal.innerHTML = '';
-
     var url = 'http://localhost:8000/api/analizar/repClaCop';
 
     fetch(url)
@@ -187,7 +184,7 @@ function btnRepClaCop() {
             return response.json();
         })
         .then(function (data) {
-            tSal.innerHTML = data.rep;
+            genRepClaCop(data.rep);
         })
         .catch(function (error) {
             alert('Hubo un problema con la petición Fetch:' + error.message);
@@ -195,9 +192,6 @@ function btnRepClaCop() {
 }
 
 function btnRepFunCop() {
-    var tSal = document.getElementById('tSal');
-    tSal.innerHTML = '';
-
     var url = 'http://localhost:8000/api/analizar/repFunCop';
 
     fetch(url)
@@ -205,7 +199,7 @@ function btnRepFunCop() {
             return response.json();
         })
         .then(function (data) {
-            tSal.innerHTML = data.rep;
+            genRepFunCop(data.rep);
         })
         .catch(function (error) {
             alert('Hubo un problema con la petición Fetch:' + error.message);
@@ -213,9 +207,6 @@ function btnRepFunCop() {
 }
 
 function btnRepVarCop() {
-    var tSal = document.getElementById('tSal');
-    tSal.innerHTML = '';
-
     var url = 'http://localhost:8000/api/analizar/repVarCop';
 
     fetch(url)
@@ -223,7 +214,7 @@ function btnRepVarCop() {
             return response.json();
         })
         .then(function (data) {
-            tSal.innerHTML = data.rep;
+            genRepVarCop(data.rep);
         })
         .catch(function (error) {
             alert('Hubo un problema con la petición Fetch:' + error.message);
@@ -240,7 +231,6 @@ function obtAST() {
             return response.json();
         })
         .then(function (data) {
-            tex.innerHTML = JSON.stringify(data, null, 2);
             crearAST(data);
         })
         .catch(function (error) {
@@ -307,8 +297,16 @@ function crearAST(varJson) {
 
 function obtErr(lisJSON) {
     var tex = '';
+    var con = 0;
     lisJSON.forEach(varJSON => {
-        tex += varJSON.err + ' ' + varJSON.lex + ' en la linea: ' + varJSON.lin + ' en la columna: ' + varJSON.col + '\n';
+        //tex += varJSON.err + ' ' + varJSON.lex + ' en la linea: ' + varJSON.lin + ' en la columna: ' + varJSON.col + '\n';
+        tex += '<tr>\n';
+        tex += '<th scope="col">' + con++ + '</th>\n';
+        tex += '<th>' + varJSON.err + '</th>\n';
+        tex += '<th>' + varJSON.lex + '</th>\n';
+        tex += '<th>' + varJSON.lin + '</th>\n';
+        tex += '<th>' + varJSON.col + '</th>\n';
+        tex += '</tr>\n';
     });
     return tex;
 }
@@ -353,4 +351,87 @@ function genHTML(lisJSON) {
     let elem = document.getElementById('repHTML');
     elem.download = nom;
     elem.href = "data:application/octet-stream," + encodeURIComponent(tex);
+}
+
+function genRepClaCop(datos) {
+    var titSal = document.getElementById('titSal');
+    var tabSal = document.getElementById('tabSal');
+
+    var tit = '<th scope="col">#</th>\n';
+    tit += '<th scope="col">Clase</th>\n';
+    tit += '<th scope="col">Main</th>\n';
+    tit += '<th scope="col">Metodos</th>\n';
+    tit += '<th scope="col">Funciones</th>\n';
+
+    titSal.innerHTML = tit;
+
+    var tab = '';
+    datos.forEach(dato => {
+        tab += '<tr>\n';
+        tab += '<th scope="row">' + dato.no + '</th>\n';
+        tab += '<td>' + dato.cla + '</td>\n';
+        tab += '<td>' + dato.cmai + '</td>\n';
+        tab += '<td>' + dato.cmet + '</td>\n';
+        tab += '<td>' + dato.cfun + '</td>\n';
+        tab += '</tr>\n';
+    });
+
+
+    tabSal.innerHTML = tab;
+}
+
+function genRepFunCop(datos) {
+    var titSal = document.getElementById('titSal');
+    var tabSal = document.getElementById('tabSal');
+
+    var tit = '<th scope="col">#</th>\n';
+    tit += '<th scope="col">Tipo</th>\n';
+    tit += '<th scope="col">Retorno</th>\n';
+    tit += '<th scope="col">Nombre</th>\n';
+    tit += '<th scope="col">Parametros</th>\n';
+    tit += '<th scope="col">Clase</th>\n';
+
+    titSal.innerHTML = tit;
+
+    var tab = '';
+    datos.forEach(dato => {
+        tab += '<tr>\n';
+        tab += '<th scope="row">' + dato.no + '</th>\n';
+        tab += '<td>' + dato.tip + '</td>\n';
+        tab += '<td>' + dato.ret + '</td>\n';
+        tab += '<td>' + dato.nom + '</td>\n';
+        tab += '<td>' + dato.par + '</td>\n';
+        tab += '<td>' + dato.cla + '</td>\n';
+        tab += '</tr>\n';
+    });
+
+
+    tabSal.innerHTML = tab;
+}
+
+function genRepVarCop(datos) {
+    var titSal = document.getElementById('titSal');
+    var tabSal = document.getElementById('tabSal');
+
+    var tit = '<th scope="col">#</th>\n';
+    tit += '<th scope="col">Tipo</th>\n';
+    tit += '<th scope="col">Nombre</th>\n';
+    tit += '<th scope="col">Mai/Met/Fun</th>\n';
+    tit += '<th scope="col">Clase</th>\n';
+
+    titSal.innerHTML = tit;
+
+    var tab = '';
+    datos.forEach(dato => {
+        tab += '<tr>\n';
+        tab += '<th scope="row">' + dato.no + '</th>\n';
+        tab += '<td>' + dato.tip + '</td>\n';
+        tab += '<td>' + dato.nom + '</td>\n';
+        tab += '<td>' + dato.mmf + '</td>\n';
+        tab += '<td>' + dato.cla + '</td>\n';
+        tab += '</tr>\n';
+    });
+
+
+    tabSal.innerHTML = tab;
 }

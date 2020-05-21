@@ -130,7 +130,7 @@ S
 
 CLAIMP
     : CLAIMPP                                                                             
-    |                                                                   { $$ = ''; }
+    |                                                                   { $$ = []; }
     ;
 
 CLAIMPP

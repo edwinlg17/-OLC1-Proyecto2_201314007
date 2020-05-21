@@ -25,7 +25,7 @@ router.get('/repHTML', (req, res) => {
 
 // get reporte clase copia
 router.get('/repClaCop', (req, res) => {
-    res.json({ rep: rep.repCalCop(cod1, cod2) });
+    res.json({ rep: rep.repClaCop(cod1, cod2) });
 });
 
 // get reporte funciones/metodos copia

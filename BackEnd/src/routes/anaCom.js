@@ -86,8 +86,8 @@ switch (yystate) {
 case 1:
   return $$[$0-1]; 
 break;
-case 3: case 7: case 8: case 19: case 25: case 26: case 32: case 33: case 34: case 35: case 36:
- this.$ = ''; 
+case 3: case 21: case 42: case 46: case 87:
+ this.$ = []; 
 break;
 case 4: case 13:
  
@@ -109,6 +109,9 @@ break;
 case 6:
  this.$ = insAPI.cla($$[$0-3], $$[$0-1]); 
 break;
+case 7: case 8: case 19: case 25: case 26: case 32: case 33: case 34: case 35: case 36:
+ this.$ = ''; 
+break;
 case 9:
  $$[$0-2].push(insAPI.val('identificador',$$[$0])); this.$ = $$[$0-2]; 
 break;
@@ -129,9 +132,6 @@ case 17:
 break;
 case 18: case 24:
  this.$ = insAPI.dec($$[$0-2], $$[$0-1]); 
-break;
-case 21: case 42: case 46: case 87:
- this.$ = []; 
 break;
 case 22:
  

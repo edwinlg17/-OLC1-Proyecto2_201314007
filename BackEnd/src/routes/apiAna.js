@@ -8,11 +8,11 @@ const ins = require('./apiJsoCom').instruccion;
 
 //////////////////////// codigo
 // reporte clase copia
-var repCalCop = function (tex1, tex2) {
+var repClaCop = function (tex1, tex2) {
     let ast1 = ana1.parse(tex1);
     let ast2 = ana2.parse(tex2);
 
-    let ret = '////////////// Reporte Clases Copia //////////////\n';
+    let ret = [];
 
     let con = 0;
 
@@ -44,7 +44,7 @@ var repCalCop = function (tex1, tex2) {
                     }
                 });
                 if (verMMF) {
-                    ret += 'No. ' + con++ + ', clase: ' + ele.ide + ' => # main: ' + canmei + ', # metodos: ' + canmet + ', # funciones: ' + canfun + '\n';
+                    ret.push({ no: con++, cla: ele.ide, cmai: canmei, cmet: canmet, cfun: canfun });
                 }
             }
         }
@@ -58,7 +58,7 @@ var repFunCop = function (tex1, tex2) {
     let ast1 = ana1.parse(tex1);
     let ast2 = ana2.parse(tex2);
 
-    let ret = '////////////// Reporte Metodos Copia //////////////\n';
+    let ret = [];
 
     let con = 0;
     ast1.forEach(ele => {
@@ -68,11 +68,11 @@ var repFunCop = function (tex1, tex2) {
                 ele.ins.forEach(mmf => {
                     if (mmf.tip_ins == ins.met) {
                         if (busMet(cla.ins, mmf.tip_ins, mmf.ide, mmf.par)) {
-                            ret += 'No. ' + con++ + ', metodo: ' + mmf.ide + ' => parametros: ' + obtLisPar(mmf.par) + ', clase: ' + ele.ide + '\n';
+                            ret.push({ no: con++, tip: mmf.tip_ins, ret: '', nom: mmf.ide, par: obtLisPar(mmf.par), cla: ele.ide });
                         }
                     } else if (mmf.tip_ins == ins.fun) {
                         if (busFun(cla.ins, mmf.tip_ins, mmf.tip_ret, mmf.ide, mmf.par)) {
-                            ret += 'No. ' + con++ + ', funcion: ' + mmf.ide + ' => retorno; ' + mmf.tip_ret + ', parametros: ' + obtLisPar(mmf.par) + ', clase: ' + ele.ide + '\n';
+                            ret.push({ no: con++, tip: mmf.tip_ins, ret: mmf.tip_ret, nom: mmf.ide, par: obtLisPar(mmf.par), cla: ele.ide });
                         }
                     }
                 });
@@ -88,7 +88,7 @@ var repVarCop = function (tex1, tex2) {
     let ast1 = ana1.parse(tex1);
     let ast2 = ana2.parse(tex2);
 
-    let ret = '////////////// Reporte Variables Copia //////////////\n';
+    let ret = [];
 
     let con = 0;
     ast1.forEach(ele => {
@@ -103,7 +103,8 @@ var repVarCop = function (tex1, tex2) {
                                 if (tdec.tip_ins == ins.dec) {
                                     tdec.var.forEach(tvar => {
                                         if (busVar(mtem.ins, tdec.tip, tvar.ide)) {
-                                            ret += 'No. ' + con++ + ', tipo: ' + tdec.tip + ', nombre: ' + tvar.ide + ', fun/met: main, clase: ' + ele.ide + '\n';
+                                            //ret += 'No. ' + con++ + ', tipo: ' + tdec.tip + ', nombre: ' + tvar.ide + ', fun/met: main, clase: ' + ele.ide + '\n';
+                                            ret.push({ no: con++, tip: tdec.tip, nom: tvar.ide, mmf: 'main', cla: ele.ide });
                                         }
                                     });
                                 }
@@ -116,7 +117,8 @@ var repVarCop = function (tex1, tex2) {
                                 if (tdec.tip_ins == ins.dec) {
                                     tdec.var.forEach(tvar => {
                                         if (busVar(mtem.ins, tdec.tip, tvar.ide)) {
-                                            ret += 'No. ' + con++ + ', tipo: ' + tdec.tip + ', nombre: ' + tvar.ide + ', fun/met: ' + mtem.ide + ', clase: ' + ele.ide + '\n';
+                                            //ret += 'No. ' + con++ + ', tipo: ' + tdec.tip + ', nombre: ' + tvar.ide + ', fun/met: ' + mtem.ide + ', clase: ' + ele.ide + '\n';
+                                            ret.push({ no: con++, tip: tdec.tip, nom: tvar.ide, mmf: mtem.ide, cla: ele.ide });
                                         }
                                     });
                                 }
@@ -129,7 +131,8 @@ var repVarCop = function (tex1, tex2) {
                                 if (tdec.tip_ins == ins.dec) {
                                     tdec.var.forEach(tvar => {
                                         if (busVar(ftem.ins, tdec.tip, tvar.ide)) {
-                                            ret += 'No. ' + con++ + ', tipo: ' + tdec.tip + ', nombre: ' + tvar.ide + ', fun/met: ' + ftem.ide + ', clase: ' + ele.ide + '\n';
+                                            //ret += 'No. ' + con++ + ', tipo: ' + tdec.tip + ', nombre: ' + tvar.ide + ', fun/met: ' + ftem.ide + ', clase: ' + ele.ide + '\n';
+                                            ret.push({ no: con++, tip: tdec.tip, nom: tvar.ide, mmf: ftem.ide, cla: ele.ide });
                                         }
                                     });
                                 }
@@ -138,7 +141,8 @@ var repVarCop = function (tex1, tex2) {
                     } else if (mmf.tip_ins == ins.dec) {
                         mmf.var.forEach(tvar => {
                             if (busVar(cla.ins, mmf.tip, tvar.ide)) {
-                                ret += 'No. ' + con++ + ', tipo: ' + mmf.tip + ', nombre: ' + tvar.ide + ', fun/met: Global, clase: ' + ele.ide + '\n';
+                                //ret += 'No. ' + con++ + ', tipo: ' + mmf.tip + ', nombre: ' + tvar.ide + ', fun/met: Global, clase: ' + ele.ide + '\n';
+                                ret.push({ no: con++, tip: mmf.tip, nom: tvar.ide, mmf: 'Global', cla: ele.ide });
                             }
                         });
                     }
@@ -242,8 +246,8 @@ var obtLisPar = function (vec) {
 }
 
 //////////////////////// exports
-exports.repCalCop = function (tex1, tex2) {
-    return repCalCop(tex1, tex2);
+exports.repClaCop = function (tex1, tex2) {
+    return repClaCop(tex1, tex2);
 };
 
 exports.repFunCop = function (tex1, tex2) {
