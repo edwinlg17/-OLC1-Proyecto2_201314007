@@ -382,7 +382,7 @@ LISEXP
 // Declaracion Multiple de Parametros                       
 PAR
     : LISPAR                                                                              
-    |                                                                   { $$ = [{text: 'indefinido'}]; }
+    |                                                                   { $$ = [{text: 'indefinido', 'icon': './img/atr.png'}]; }
     ;
 
 LISPAR

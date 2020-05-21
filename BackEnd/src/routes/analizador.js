@@ -86,7 +86,7 @@ switch (yystate) {
 case 1:
  return $$[$0-1]; 
 break;
-case 3: case 12: case 21:
+case 3: case 12: case 21: case 89:
  this.$ = [{text: 'indefinido', 'icon': './img/atr.png'}]; 
 break;
 case 4:
@@ -359,9 +359,6 @@ case 84:
 break;
 case 85:
  this.$ = $$[$0-1]; 
-break;
-case 89:
- this.$ = [{text: 'indefinido'}]; 
 break;
 case 90:
  this.$ = [insAPI.decPar($$[$0-1], $$[$0])]; 
